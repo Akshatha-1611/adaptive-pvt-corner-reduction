@@ -1,3 +1,4 @@
+from analysis.correlation import align_paths
 from analysis.correlation import (
     extract_slack_vectors,
     compute_vector_correlation,
@@ -19,12 +20,16 @@ def parse_all_corners():
             corner_name = file.replace(".txt", "")
             file_path = os.path.join(report_dir, file)
 
-            paths = parse_timing_report(file_path)
+            path_dict = parse_timing_report(file_path)
+
+            # Convert dictionary → list for metrics function
+            paths = [{"slack": v} for v in path_dict.values()]
+
             metrics = compute_metrics(paths)
 
             corner_results[corner_name] = {
-                "paths": paths,
-                "metrics": metrics
+            "paths": path_dict,   #  store dictionary
+            "metrics": metrics
             }
 
     return corner_results
@@ -38,6 +43,6 @@ if __name__ == "__main__":
         print("Metrics:", data["metrics"])
 
     # New flow
-    vectors = extract_slack_vectors(results)
-    names, matrix = compute_vector_correlation(vectors)
+    aligned_vectors = align_paths(results)
+    names, matrix = compute_vector_correlation(aligned_vectors)
     find_redundant_corners(names, matrix)

@@ -11,7 +11,7 @@ def extract_slack_vectors(corner_results):
 
 
 def compute_vector_correlation(vectors):
-    print("\n--- Vector-Based Correlation Matrix ---\n")
+    print("\n--- Path-Aligned Correlation Matrix ---\n")
 
     corner_names = list(vectors.keys())
     matrix = []
@@ -55,3 +55,27 @@ def find_redundant_corners(corner_names, matrix, threshold=0.95):
 
     print("\nSuggested removal:", list(redundant))
     return redundant
+
+def align_paths(corner_results):
+    print("\n--- Aligning Paths Across Corners ---")
+
+    # Step 1: collect all path sets
+    path_sets = []
+    for data in corner_results.values():
+        path_sets.append(set(data["paths"].keys()))
+
+    # Step 2: find common paths
+    common_paths = set.intersection(*path_sets)
+
+    print("Common paths:", common_paths)
+
+    # Step 3: build aligned vectors
+    aligned_vectors = {}
+
+    for corner, data in corner_results.items():
+        aligned_vectors[corner] = []
+
+        for p in common_paths:
+            aligned_vectors[corner].append(data["paths"][p])
+
+    return aligned_vectors

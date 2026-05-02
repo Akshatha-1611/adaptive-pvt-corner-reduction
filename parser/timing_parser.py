@@ -1,30 +1,32 @@
 # timing_parser.py
 
 def parse_timing_report(file_path):
-    paths = []
-    
+    path_dict = {}
+
     with open(file_path, 'r') as file:
         lines = file.readlines()
 
-    current_path = {}
+    start = None
+    end = None
 
     for line in lines:
         line = line.strip()
 
         if line.startswith("Startpoint"):
-            current_path["start"] = line.split(":")[1].strip()
+            start = line.split(":")[1].strip()
 
         elif line.startswith("Endpoint"):
-            current_path["end"] = line.split(":")[1].strip()
+            end = line.split(":")[1].strip()
 
         elif "Slack" in line:
-            slack_value = float(line.split(":")[1].strip())
-            current_path["slack"] = slack_value
+            slack = float(line.split(":")[1].strip())
 
-            paths.append(current_path)
-            current_path = {}
+            #  unique path id
+            path_id = f"{start}->{end}"
 
-    return paths
+            path_dict[path_id] = slack
+
+    return path_dict
 
 
 #  NEW FUNCTION
