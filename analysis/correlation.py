@@ -1,5 +1,14 @@
 import numpy as np
 
+def compute_weight(slack):
+    # Higher importance for worse slack
+    if slack < 0:
+        return 2.0   # violation → very important
+    elif slack < 0.05:
+        return 1.0   # near critical
+    else:
+        return 0.5   # safe path
+
 def extract_slack_vectors(corner_results):
     vectors = {}
     
@@ -68,6 +77,7 @@ def align_paths(corner_results):
     common_paths = set.intersection(*path_sets)
 
     print("Common paths:", common_paths)
+    
 
     # Step 3: build aligned vectors
     aligned_vectors = {}
@@ -76,6 +86,13 @@ def align_paths(corner_results):
         aligned_vectors[corner] = []
 
         for p in common_paths:
-            aligned_vectors[corner].append(data["paths"][p])
+            slack = data["paths"][p]
+            weight = compute_weight(slack)
 
+            # multiply slack with weight
+            aligned_vectors[corner].append(slack * weight)
+
+    print("\nAligned vectors (with weights):")
+    for c, v in aligned_vectors.items():
+        print(c, v)
     return aligned_vectors
