@@ -1,3 +1,4 @@
+from analysis.correlation import compute_wns_correlation, find_redundant_corners
 from analysis.correlation import compute_wns_correlation
 from parser.timing_parser import parse_timing_report, compute_metrics
 import os
@@ -33,5 +34,8 @@ if __name__ == "__main__":
         print(f"\nCorner: {corner}")
         print("Metrics:", data["metrics"])
 
-    # Call correlation
-    compute_wns_correlation(results)
+    # Correlation
+    names, matrix = compute_wns_correlation(results)
+
+    # Redundancy detection
+    find_redundant_corners(names, matrix)
