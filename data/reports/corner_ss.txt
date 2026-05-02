@@ -1,7 +1,11 @@
 Startpoint: U1
 Endpoint: U10
-Slack (VIOLATED): -0.15
+Slack (VIOLATED): -0.20
 
 Startpoint: U2
 Endpoint: U20
+Slack (VIOLATED): -0.10
+
+Startpoint: U3
+Endpoint: U30
 Slack: 0.02

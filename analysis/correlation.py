@@ -1,42 +1,57 @@
 import numpy as np
 
-def compute_wns_correlation(corner_results):
-    print("\n--- WNS Correlation Matrix ---\n")
+def extract_slack_vectors(corner_results):
+    vectors = {}
+    
+    for corner, data in corner_results.items():
+        slacks = [p["slack"] for p in data["paths"]]
+        vectors[corner] = np.array(slacks)
+    
+    return vectors
 
-    corner_names = list(corner_results.keys())
-    wns_values = [corner_results[c]["metrics"]["WNS"] for c in corner_names]
 
-    # Convert to numpy array
-    data = np.array(wns_values)
+def compute_vector_correlation(vectors):
+    print("\n--- Vector-Based Correlation Matrix ---\n")
 
-    # Since WNS is 1D, we compare differences manually
-    correlation_matrix = []
+    corner_names = list(vectors.keys())
+    matrix = []
 
-    for i in range(len(data)):
+    for i in range(len(corner_names)):
         row = []
-        for j in range(len(data)):
-            diff = abs(data[i] - data[j])
-            similarity = 1 / (1 + diff)  # simple similarity score
-            row.append(round(similarity, 3))
-        correlation_matrix.append(row)
+        for j in range(len(corner_names)):
+            v1 = vectors[corner_names[i]]
+            v2 = vectors[corner_names[j]]
 
-    # Print matrix
+            # Handle unequal lengths
+            min_len = min(len(v1), len(v2))
+            v1_trim = v1[:min_len]
+            v2_trim = v2[:min_len]
+
+            if len(v1_trim) == 0:
+                corr = 0
+            else:
+                corr = np.corrcoef(v1_trim, v2_trim)[0, 1]
+
+            row.append(float(round(corr, 3)))
+        matrix.append(row)
+
     print("Corners:", corner_names)
-    for i, row in enumerate(correlation_matrix):
+    for i, row in enumerate(matrix):
         print(corner_names[i], ":", row)
 
-    return corner_names, correlation_matrix
+    return corner_names, matrix
 
-def find_redundant_corners(corner_names, corr_matrix, threshold=0.95):
-    print("\n--- Redundant Corners ---\n")
+
+def find_redundant_corners(corner_names, matrix, threshold=0.95):
+    print("\n--- Redundant Corners (Advanced) ---\n")
 
     redundant = set()
 
     for i in range(len(corner_names)):
         for j in range(i + 1, len(corner_names)):
-            if corr_matrix[i][j] >= threshold:
-                print(f"{corner_names[i]} ≈ {corner_names[j]} (similarity: {corr_matrix[i][j]})")
+            if matrix[i][j] >= threshold:
+                print(f"{corner_names[i]} ≈ {corner_names[j]} (corr: {matrix[i][j]})")
                 redundant.add(corner_names[j])
 
-    print("\nSuggested corners to remove:", list(redundant))
+    print("\nSuggested removal:", list(redundant))
     return redundant

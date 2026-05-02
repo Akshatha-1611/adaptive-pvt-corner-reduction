@@ -1,5 +1,8 @@
-from analysis.correlation import compute_wns_correlation, find_redundant_corners
-from analysis.correlation import compute_wns_correlation
+from analysis.correlation import (
+    extract_slack_vectors,
+    compute_vector_correlation,
+    find_redundant_corners
+)
 from parser.timing_parser import parse_timing_report, compute_metrics
 import os
 
@@ -34,8 +37,7 @@ if __name__ == "__main__":
         print(f"\nCorner: {corner}")
         print("Metrics:", data["metrics"])
 
-    # Correlation
-    names, matrix = compute_wns_correlation(results)
-
-    # Redundancy detection
+    # New flow
+    vectors = extract_slack_vectors(results)
+    names, matrix = compute_vector_correlation(vectors)
     find_redundant_corners(names, matrix)
