@@ -1,4 +1,5 @@
-# correlation.py
+def compute_wns_correlation(corner_results):
+    print("\nWNS Comparison Across Corners:\n")
 
-def compute_correlation(data):
-    print("Computing correlation between corners")
+    for corner, data in corner_results.items():
+        print(f"{corner}: {data['metrics']['WNS']}")

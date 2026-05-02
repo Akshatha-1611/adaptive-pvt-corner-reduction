@@ -1,0 +1,7 @@
+Startpoint: U1
+Endpoint: U10
+Slack: 0.05
+
+Startpoint: U2
+Endpoint: U20
+Slack: 0.20
