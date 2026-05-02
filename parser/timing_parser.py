@@ -27,6 +27,27 @@ def parse_timing_report(file_path):
     return paths
 
 
+#  NEW FUNCTION
+def compute_metrics(paths):
+    slacks = [p["slack"] for p in paths]
+
+    wns = min(slacks)  # Worst Negative Slack
+    tns = sum([s for s in slacks if s < 0])  # Total Negative Slack
+    violations = [p for p in paths if p["slack"] < 0]
+
+    return {
+        "WNS": wns,
+        "TNS": tns,
+        "violations": violations
+    }
+
+
 if __name__ == "__main__":
-    result = parse_timing_report("data/reports/sample_report.txt")
-    print(result)
+    paths = parse_timing_report("data/reports/sample_report.txt")
+    metrics = compute_metrics(paths)
+
+    print("Parsed Paths:")
+    print(paths)
+
+    print("\nMetrics:")
+    print(metrics)
