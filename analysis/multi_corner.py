@@ -1,3 +1,5 @@
+from optimizer.corner_selector import select_optimal_corners
+from analysis.clustering import cluster_corners
 from analysis.correlation import align_paths
 from analysis.correlation import (
     extract_slack_vectors,
@@ -44,5 +46,12 @@ if __name__ == "__main__":
 
     # New flow
     aligned_vectors = align_paths(results)
+
+    #  NEW STEP
+    clusters = cluster_corners(aligned_vectors)
+
     names, matrix = compute_vector_correlation(aligned_vectors)
+
     find_redundant_corners(names, matrix)
+
+    select_optimal_corners(results, names, matrix)
