@@ -1,38 +1,35 @@
-def select_optimal_corners(corner_results, corr_names, corr_matrix, threshold=0.95):
-    print("\n--- Final Corner Selection ---\n")
+def select_from_clusters(clusters, corner_results):
+    print("\n--- Optimization: Cluster-Based Selection ---\n")
 
-    # Step 1: find worst-case corner
+    selected = []
+
+    # Step 1: Find global worst-case corner
     worst_corner = min(
         corner_results,
         key=lambda c: corner_results[c]["metrics"]["WNS"]
     )
 
-    print(f"Worst-case corner: {worst_corner}")
+    print(f"Global worst-case corner: {worst_corner}")
 
-    selected = set([worst_corner])
-    removed = set()
+    # Step 2: Process each cluster
+    for cluster_id, members in clusters.items():
+        print(f"\nCluster {cluster_id}: {members}")
 
-    # Step 2: remove highly correlated
-    for i in range(len(corr_names)):
-        for j in range(i + 1, len(corr_names)):
-            if corr_matrix[i][j] >= threshold:
-                c1 = corr_names[i]
-                c2 = corr_names[j]
+        # If worst corner is inside cluster → keep it
+        if worst_corner in members:
+            print(f"→ Keeping worst-case corner: {worst_corner}")
+            selected.append(worst_corner)
+            continue
 
-                if corner_results[c1]["metrics"]["WNS"] <= corner_results[c2]["metrics"]["WNS"]:
-                    keep, drop = c1, c2
-                else:
-                    keep, drop = c2, c1
+        # Otherwise select representative (worst WNS in cluster)
+        best = min(
+            members,
+            key=lambda c: corner_results[c]["metrics"]["WNS"]
+        )
 
-                selected.add(keep)
-                removed.add(drop)
+        print(f"→ Selected representative: {best}")
+        selected.append(best)
 
-    # Step 3: include remaining
-    for c in corner_results:
-        if c not in removed:
-            selected.add(c)
-
-    print("Selected Corners:", list(selected))
-    print("Removed Corners:", list(removed))
+    print("\nFinal Optimized Corner Set:", selected)
 
     return selected

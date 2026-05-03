@@ -1,4 +1,4 @@
-from optimizer.corner_selector import select_optimal_corners
+from optimizer.corner_selector import select_from_clusters
 from analysis.clustering import cluster_corners
 from analysis.correlation import align_paths
 from analysis.correlation import (
@@ -47,11 +47,12 @@ if __name__ == "__main__":
     # New flow
     aligned_vectors = align_paths(results)
 
-    #  NEW STEP
+    # Step 1: Clustering
     clusters = cluster_corners(aligned_vectors)
 
+    # Step 2: Correlation (for analysis)
     names, matrix = compute_vector_correlation(aligned_vectors)
-
     find_redundant_corners(names, matrix)
 
-    select_optimal_corners(results, names, matrix)
+    # Step 3: Optimization
+    select_from_clusters(clusters, results)
