@@ -51,3 +51,16 @@ def validate_results(corner_results, selected_corners):
         print("\n VALIDATION FAILED")
 
     return delta_wns, delta_tns
+
+def get_validation_results(corner_results, selected_corners):
+    full_wns, full_tns = compute_global_metrics(corner_results)
+    red_wns, red_tns = compute_global_metrics(corner_results, selected_corners)
+
+    delta_wns = abs(full_wns - red_wns)
+    delta_tns = abs(full_tns - red_tns)
+
+    return {
+        "full": {"WNS": full_wns, "TNS": full_tns},
+        "reduced": {"WNS": red_wns, "TNS": red_tns},
+        "delta": {"WNS": delta_wns, "TNS": delta_tns}
+    }

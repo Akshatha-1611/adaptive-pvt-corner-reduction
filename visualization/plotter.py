@@ -31,7 +31,7 @@ def plot_metrics(corner_results):
     x = np.arange(len(corners))
 
     plt.figure()
-    plt.bar(x - 0.2, wns, 0.4, label="WNS")
+    plt.bar(x - 0.2, wns, 0.4, label="WNS")  
     plt.bar(x + 0.2, tns, 0.4, label="TNS")
 
     plt.legend()
