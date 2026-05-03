@@ -1,3 +1,4 @@
+from analysis.validation import validate_results
 from optimizer.corner_selector import select_from_clusters
 from analysis.clustering import cluster_corners
 from analysis.correlation import align_paths
@@ -55,4 +56,6 @@ if __name__ == "__main__":
     find_redundant_corners(names, matrix)
 
     # Step 3: Optimization
-    select_from_clusters(clusters, results)
+    selected = select_from_clusters(clusters, results)
+
+    validate_results(results, selected)
