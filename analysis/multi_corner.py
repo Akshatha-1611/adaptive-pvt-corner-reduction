@@ -3,6 +3,21 @@ from analysis.validation import validate_results
 from optimizer.corner_selector import select_from_clusters
 from analysis.clustering import cluster_corners
 from analysis.correlation import align_paths
+def compute_metrics_from_dict(path_dict):
+    slacks = list(path_dict.values())
+
+    #  SAFETY CHECK
+    if not slacks:
+        print("WARNING: Empty slack list detected")
+        return {"WNS": 0, "TNS": 0}
+
+    wns = min(slacks)
+    tns = sum(s for s in slacks if s < 0)
+
+    return {
+        "WNS": wns,
+        "TNS": tns
+    }
 from analysis.correlation import (
     extract_slack_vectors,
     compute_vector_correlation,
@@ -64,3 +79,39 @@ if __name__ == "__main__":
 
     # Step 5: Validation
     validate_results(results, selected)
+
+def main_pipeline(file_paths):
+    results = {}
+
+    from parser.timing_parser import parse_timing_report
+    from analysis.correlation import align_paths
+    from analysis.clustering import cluster_corners
+    from optimizer.corner_selector import select_from_clusters
+
+    #  Parse reports
+    for file_path in file_paths:
+        corner_name = file_path.split("\\")[-1].split(".")[0]
+
+        path_dict = parse_timing_report(file_path)
+
+        print("DEBUG:", file_path, path_dict)
+
+        metrics = compute_metrics_from_dict(path_dict)
+
+        results[corner_name] = {
+            "paths": path_dict,
+            "metrics": metrics
+        }
+    print("DEBUG path_dict:", path_dict)
+    print("DEBUG values:", list(path_dict.values()))
+
+    #  Align
+    aligned_vectors = align_paths(results)
+
+    #  Cluster
+    clusters = cluster_corners(aligned_vectors)
+
+    #  Select
+    selected = select_from_clusters(clusters, results)
+
+    return results, selected
