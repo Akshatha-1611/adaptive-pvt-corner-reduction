@@ -1,3 +1,4 @@
+from visualization.plotter import plot_correlation_matrix, plot_metrics
 from analysis.validation import validate_results
 from optimizer.corner_selector import select_from_clusters
 from analysis.clustering import cluster_corners
@@ -51,11 +52,15 @@ if __name__ == "__main__":
     # Step 1: Clustering
     clusters = cluster_corners(aligned_vectors)
 
-    # Step 2: Correlation (for analysis)
+    # Step 2: Correlation
     names, matrix = compute_vector_correlation(aligned_vectors)
-    find_redundant_corners(names, matrix)
 
-    # Step 3: Optimization
+    # step 3: Visualization
+    plot_correlation_matrix(names, matrix)
+    plot_metrics(results)
+
+    # Step 4: Optimization
     selected = select_from_clusters(clusters, results)
 
+    # Step 5: Validation
     validate_results(results, selected)
