@@ -2,6 +2,7 @@ import streamlit as st
 import tempfile
 
 from analysis.multi_corner import main_pipeline
+from ml_models.corner_predictor import train_model, predict_importance
 from analysis.correlation import compute_vector_correlation, align_paths
 
 import plotly.graph_objects as go
@@ -126,6 +127,21 @@ if uploaded_files:
         with st.expander(f"{corner}"):
             st.write("Metrics:", data["metrics"])
             st.write("Paths:", data["paths"])
+    
+    # -------------------- ML PREDICTION --------------------
+    st.markdown("###  ML-Based Corner Importance Prediction")
+
+    model, _ = train_model(results, selected)
+    predictions = predict_importance(model, results)
+
+    for corner, pred in predictions.items():
+        decision = pred["decision"]
+        confidence = pred["confidence"]
+
+        if decision == "KEEP":
+            st.success(f"{corner} → {decision} (Confidence: {confidence})")
+        else:
+            st.warning(f"{corner} → {decision} (Confidence: {confidence})")
 
     # -------------------- FOOTER --------------------
     st.markdown("---")
