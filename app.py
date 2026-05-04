@@ -2,13 +2,26 @@ import streamlit as st
 import tempfile
 
 from analysis.multi_corner import main_pipeline
-from visualization.plotter import plot_correlation_matrix, plot_metrics
 from analysis.correlation import compute_vector_correlation, align_paths
 
-st.title(" Adaptive PVT Corner Reduction Tool")
+import plotly.graph_objects as go
+import plotly.express as px
+import numpy as np
 
+# -------------------- PAGE CONFIG --------------------
+st.set_page_config(page_title="PVT Corner Reduction", layout="wide")
+
+# -------------------- SIDEBAR --------------------
+st.sidebar.title(" Settings")
+st.sidebar.write("Adaptive PVT Corner Reduction Dashboard")
+
+# -------------------- TITLE --------------------
+st.title(" Adaptive PVT Corner Reduction Tool")
+st.markdown("Analyze and reduce redundant STA PVT corners using intelligent automation.")
+
+# -------------------- FILE UPLOAD --------------------
 uploaded_files = st.file_uploader(
-    "Upload STA Reports",
+    " Upload STA Reports",
     accept_multiple_files=True
 )
 
@@ -17,7 +30,7 @@ if uploaded_files:
     temp_paths = []
     file_name_map = {}
 
-    #  STEP 1: Save files + create mapping
+    # -------------------- SAVE FILES --------------------
     for file in uploaded_files:
         temp_path = tempfile.NamedTemporaryFile(delete=False, suffix=".txt")
         temp_path.write(file.getvalue())
@@ -25,16 +38,14 @@ if uploaded_files:
 
         temp_paths.append(temp_path.name)
 
-        # IMPORTANT: match pipeline naming (tmpxxxx)
         key = temp_path.name.split("\\")[-1].split(".")[0]
         file_name_map[key] = file.name.replace(".txt", "")
 
-    #  STEP 2: Run pipeline
+    # -------------------- RUN PIPELINE --------------------
     results, selected = main_pipeline(temp_paths)
 
-    #  STEP 3: Fix names
+    # -------------------- FIX NAMES --------------------
     new_results = {}
-
     for key, data in results.items():
         original_name = file_name_map.get(key, key)
         new_results[original_name] = data
@@ -42,34 +53,80 @@ if uploaded_files:
     results = new_results
     selected = [file_name_map.get(s, s) for s in selected]
 
-    #  STEP 4: Display summary
+    # -------------------- SUMMARY --------------------
     st.markdown("---")
-    st.header(" Summary")
-
     col1, col2 = st.columns(2)
+
     col1.metric("Total Corners", len(results))
     col2.metric("Selected Corners", len(selected))
 
-    #  STEP 5: Selected corners
+    # -------------------- SELECTED CORNERS --------------------
     st.markdown("###  Selected Corners")
-    for c in selected:
-        st.success(c)
+    cols = st.columns(len(selected))
 
-    #  STEP 6: Metrics
+    for i, c in enumerate(selected):
+        cols[i].success(c)
+
+    # -------------------- METRICS TABLE --------------------
     st.markdown("###  Corner Metrics")
-    for corner, data in results.items():
-        with st.expander(corner):
-            st.write(data["metrics"])
 
-    #  STEP 7: Visualization (ONLY ONCE)
+    corners = list(results.keys())
+    wns = [results[c]["metrics"]["WNS"] for c in corners]
+    tns = [results[c]["metrics"]["TNS"] for c in corners]
+
+    # -------------------- INTERACTIVE BAR CHART --------------------
+    st.markdown("###  WNS vs TNS (Interactive)")
+
+    fig_bar = go.Figure()
+
+    fig_bar.add_trace(go.Bar(
+        x=corners,
+        y=wns,
+        name="WNS"
+    ))
+
+    fig_bar.add_trace(go.Bar(
+        x=corners,
+        y=tns,
+        name="TNS"
+    ))
+
+    fig_bar.update_layout(
+        barmode='group',
+        title="Corner Timing Metrics",
+        xaxis_title="Corners",
+        yaxis_title="Slack Values"
+    )
+
+    st.plotly_chart(fig_bar, use_container_width=True)
+
+    # -------------------- CORRELATION HEATMAP --------------------
+    st.markdown("###  Correlation Heatmap (Interactive)")
+
     aligned_vectors = align_paths(results)
     names, matrix = compute_vector_correlation(aligned_vectors)
 
-    plot_correlation_matrix(names, matrix)
-    plot_metrics(results)
+    matrix_np = np.array(matrix)
 
-    st.markdown("###  Correlation Heatmap")
-    st.image("results/correlation_heatmap.png")
+    fig_heatmap = px.imshow(
+        matrix_np,
+        x=names,
+        y=names,
+        text_auto=True,
+        aspect="auto",
+        title="Corner Correlation Matrix"
+    )
 
-    st.markdown("###  WNS vs TNS")
-    st.image("results/metrics_comparison.png")
+    st.plotly_chart(fig_heatmap, use_container_width=True)
+
+    # -------------------- DETAILED VIEW --------------------
+    st.markdown("###  Detailed Corner Data")
+
+    for corner, data in results.items():
+        with st.expander(f"{corner}"):
+            st.write("Metrics:", data["metrics"])
+            st.write("Paths:", data["paths"])
+
+    # -------------------- FOOTER --------------------
+    st.markdown("---")
+    st.caption("Built with Python + Streamlit | VLSI STA Optimization Project")
