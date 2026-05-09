@@ -51,7 +51,8 @@ def main_pipeline(file_paths):
     results = {}
 
     for file_path in file_paths:
-        corner_name = file_path.split("\\")[-1].split(".")[0]
+        import os
+        corner_name = os.path.basename(file_path).split(".")[0]
 
         path_dict = parse_timing_report(file_path)
 
