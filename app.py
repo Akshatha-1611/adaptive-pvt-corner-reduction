@@ -113,7 +113,7 @@ st.markdown(
 # =====================================================
 # SIDEBAR
 # =====================================================
-st.sidebar.title("⚙️ Dashboard Settings")
+st.sidebar.title(" Dashboard Settings")
 
 st.sidebar.markdown(
     """
@@ -138,7 +138,7 @@ st.markdown(
     """
     <div class="fadeIn">
 
-    # ⚡ Adaptive PVT Corner Reduction Tool
+    #  Adaptive PVT Corner Reduction Tool
 
     ### Intelligent STA Corner Optimization Framework
 
@@ -155,7 +155,7 @@ st.markdown(
 # =====================================================
 # ARCHITECTURE DIAGRAM
 # =====================================================
-st.markdown("## 🏗️ Framework Architecture")
+st.markdown("##  Framework Architecture")
 
 architecture_html = """
 <div style="
@@ -177,7 +177,7 @@ width:180px;
 text-align:center;
 animation: fadeInAnimation 1s ease-in;
 ">
-<h3>📂 STA Reports</h3>
+<h3> STA Reports</h3>
 <p>Upload Timing Reports</p>
 </div>
 
@@ -207,7 +207,7 @@ width:180px;
 text-align:center;
 animation: fadeInAnimation 1.6s ease-in;
 ">
-<h3>🤖 ML Prediction</h3>
+<h3> ML Prediction</h3>
 <p>Corner Importance Estimation</p>
 </div>
 
@@ -222,7 +222,7 @@ width:180px;
 text-align:center;
 animation: fadeInAnimation 1.9s ease-in;
 ">
-<h3>📊 Visualization</h3>
+<h3> Visualization</h3>
 <p>Interactive Analytics Dashboard</p>
 </div>
 
@@ -239,7 +239,7 @@ st.markdown(
 # FILE UPLOAD
 # =====================================================
 uploaded_files = st.file_uploader(
-    "📤 Upload STA Timing Reports",
+    " Upload STA Timing Reports",
     accept_multiple_files=True,
     type=["txt", "rpt"]
 )
@@ -274,7 +274,9 @@ if uploaded_files:
             .replace(".rpt", "")
         )
 
-        file_name_map[temp_file.name] = clean_name
+        temp_key = os.path.basename(temp_file.name).split(".")[0]
+
+        file_name_map[temp_key] = clean_name
 
     # -------------------------------------------------
     # RUN PIPELINE
@@ -288,9 +290,11 @@ if uploaded_files:
 
     for key, data in results.items():
 
+        clean_key = os.path.basename(key).split(".")[0]
+
         original_name = file_name_map.get(
-            key,
-            os.path.basename(key)
+            clean_key,
+            clean_key
         )
 
         renamed_results[original_name] = data
@@ -322,7 +326,7 @@ if uploaded_files:
     # =================================================
     # SELECTED CORNERS
     # =================================================
-    st.markdown("## ✅ Selected Optimal Corners")
+    st.markdown("##  Selected Optimal Corners")
 
     cols = st.columns(max(len(selected), 1))
 
@@ -347,7 +351,7 @@ if uploaded_files:
     # =================================================
     # DATAFRAME
     # =================================================
-    st.markdown("## 📋 Corner Metrics")
+    st.markdown("##  Corner Metrics")
 
     metrics_data = {
         "Corner": corners,
@@ -363,7 +367,7 @@ if uploaded_files:
     # =================================================
     # BAR CHART
     # =================================================
-    st.markdown("## 📊 WNS vs TNS Analysis")
+    st.markdown("##  WNS vs TNS Analysis")
 
     fig_bar = go.Figure()
 
@@ -400,7 +404,7 @@ if uploaded_files:
     # =================================================
     # HEATMAP
     # =================================================
-    st.markdown("## 🔥 Correlation Heatmap")
+    st.markdown("##  Correlation Heatmap")
 
     aligned_vectors = align_paths(results)
 
@@ -433,11 +437,11 @@ if uploaded_files:
     # =================================================
     # DETAILED DATA
     # =================================================
-    st.markdown("## 📁 Detailed Corner Data")
+    st.markdown("##  Detailed Corner Data")
 
     for corner, data in results.items():
 
-        with st.expander(f"📌 {corner}"):
+        with st.expander(f" {corner}"):
 
             st.write(
                 "### Metrics"
@@ -455,7 +459,7 @@ if uploaded_files:
     # ML PREDICTIONS
     # =================================================
     st.markdown(
-        "## 🤖 ML-Based Corner Importance Prediction"
+        "##  ML-Based Corner Importance Prediction"
     )
 
     model, _ = train_model(
