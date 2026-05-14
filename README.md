@@ -2,6 +2,9 @@
 
 A **Python-based intelligent framework** to reduce redundant **PVT (Process, Voltage, Temperature) corners** in **Static Timing Analysis (STA)** using data-driven techniques such as correlation, clustering, and optimization.
 
+#  live demo
+https://adaptive-pvt-corner-reduction.onrender.com
+
 ---
 
 #  Table of Contents
