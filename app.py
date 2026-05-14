@@ -192,7 +192,7 @@ width:180px;
 text-align:center;
 animation: fadeInAnimation 1.3s ease-in;
 ">
-<h3>🔍 Analysis Engine</h3>
+<h3> Analysis Engine</h3>
 <p>Path Correlation & Metrics</p>
 </div>
 
