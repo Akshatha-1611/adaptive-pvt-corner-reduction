@@ -1,6 +1,11 @@
 Startpoint: CPU_CORE
 Endpoint: SRAM_BLOCK
 Slack: -0.08
-Delay: 4.68
-WNS: -0.08
-TNS: -2.1
+
+Startpoint: ALU_STAGE
+Endpoint: CACHE_CTRL
+Slack: -0.05
+
+Startpoint: FETCH_UNIT
+Endpoint: DECODE_STAGE
+Slack: -0.02
