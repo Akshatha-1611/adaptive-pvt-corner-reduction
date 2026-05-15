@@ -7,7 +7,6 @@ from ml_models.corner_predictor import (
     train_model,
     predict_importance
 )
-
 from analysis.correlation import (
     compute_vector_correlation,
     align_paths
@@ -21,276 +20,272 @@ import numpy as np
 # =====================================================
 # PAGE CONFIG
 # =====================================================
+
 st.set_page_config(
     page_title="Adaptive PVT Corner Reduction",
-    page_icon="⚡",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    layout="wide"
 )
 
 
 # =====================================================
-# CUSTOM DARK THEME + ANIMATIONS
+# CUSTOM DARK UI
 # =====================================================
-st.markdown(
-    """
-    <style>
 
-    /* MAIN BACKGROUND */
-    .stApp {
-        background-color: #0E1117;
-        color: white;
-    }
+st.markdown("""
+<style>
 
-    /* SIDEBAR */
-    section[data-testid="stSidebar"] {
-        background-color: #161B22;
-    }
+.stApp {
+    background-color: #0D1117;
+    color: white;
+}
 
-    /* TITLES */
-    h1, h2, h3 {
-        color: #58A6FF;
-    }
+section[data-testid="stSidebar"] {
+    background-color: #161B22;
+}
 
-    /* METRIC CARDS */
-    div[data-testid="metric-container"] {
-        background-color: #161B22;
-        border: 1px solid #30363D;
-        padding: 15px;
-        border-radius: 12px;
-    }
+h1, h2, h3, h4 {
+    color: white;
+}
 
-    /* DATAFRAME */
-    .stDataFrame {
-        border-radius: 10px;
-        overflow: hidden;
-    }
+.stButton>button {
+    background-color: #238636;
+    color: white;
+    border-radius: 10px;
+    border: none;
+    padding: 0.6rem 1rem;
+    font-weight: 600;
+}
 
-    /* BUTTONS */
-    .stButton > button {
-        background-color: #238636;
-        color: white;
-        border-radius: 10px;
-        border: none;
-        padding: 10px 20px;
-        transition: 0.3s;
-    }
+.stButton>button:hover {
+    background-color: #2EA043;
+}
 
-    .stButton > button:hover {
-        background-color: #2EA043;
-        transform: scale(1.02);
-    }
+.metric-card {
+    background-color: #161B22;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #30363D;
+}
 
-    /* EXPANDERS */
-    .streamlit-expanderHeader {
-        background-color: #161B22;
-        border-radius: 10px;
-    }
+.arch-box {
+    background-color: #161B22;
+    border: 1px solid #30363D;
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    transition: 0.3s;
+    font-weight: 600;
+}
 
-    /* ANIMATION */
-    .fadeIn {
-        animation: fadeInAnimation 1s ease-in;
-    }
+.arch-box:hover {
+    transform: scale(1.03);
+    border-color: #58A6FF;
+}
 
-    @keyframes fadeInAnimation {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
+.arrow {
+    text-align: center;
+    font-size: 28px;
+    color: #58A6FF;
+    margin-top: -5px;
+    margin-bottom: -5px;
+}
 
-        to {
-            opacity: 1;
-            transform: translateY(0px);
-        }
-    }
-
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+</style>
+""", unsafe_allow_html=True)
 
 
 # =====================================================
 # SIDEBAR
 # =====================================================
-st.sidebar.title(" Dashboard Settings")
 
-st.sidebar.markdown(
-    """
-    ### Features
-    - Multi-Corner STA Analysis
-    - Correlation-Based Reduction
-    - ML-Assisted Prediction
-    - Interactive Visualization
-    - PVT Optimization
-    """
-)
-
-st.sidebar.info(
-    "Adaptive PVT Corner Reduction Framework"
+st.sidebar.title("Configuration")
+st.sidebar.write(
+    "Adaptive PVT Corner Reduction Dashboard"
 )
 
 
 # =====================================================
-# HERO SECTION
+# TITLE
 # =====================================================
+
+st.title("Adaptive PVT Corner Reduction Tool")
+
 st.markdown(
     """
-    <div class="fadeIn">
-
-    #  Adaptive PVT Corner Reduction Tool
-
-    ### Intelligent STA Corner Optimization Framework
-
-    Analyze STA timing reports, detect redundant corners,
-    visualize timing relationships, and perform ML-assisted
+    Analyze and reduce redundant STA PVT corners
+    using intelligent automation and ML-assisted
     corner selection.
+    """
+)
+
+
+# =====================================================
+# DEMO MODE PANEL
+# =====================================================
+
+st.markdown(
+    """
+    <div style="
+        background-color:#161B22;
+        padding:18px;
+        border-radius:12px;
+        border:1px solid #30363D;
+        margin-bottom:20px;
+    ">
+
+    <h4 style="margin-bottom:5px;">
+    No STA reports?
+    </h4>
+
+    <p style="color:#B0B0B0;">
+    Launch the application using built-in
+    sample timing reports.
+    </p>
 
     </div>
     """,
     unsafe_allow_html=True
 )
 
+demo_mode = st.button("Run Demo Mode")
+
 
 # =====================================================
-# ARCHITECTURE DIAGRAM
+# ARCHITECTURE VIEW
 # =====================================================
-st.markdown("##  Framework Architecture")
 
-architecture_html = """
-<div style="
-display:flex;
-justify-content:center;
-align-items:center;
-gap:20px;
-flex-wrap:wrap;
-margin-top:20px;
-margin-bottom:30px;
-">
+st.markdown("## System Architecture")
 
-<div style="
-background:#161B22;
-padding:20px;
-border-radius:15px;
-border:1px solid #30363D;
-width:180px;
-text-align:center;
-animation: fadeInAnimation 1s ease-in;
-">
-<h3> STA Reports</h3>
-<p>Upload Timing Reports</p>
-</div>
+col1, col2, col3, col4 = st.columns(4)
 
-<div style="font-size:40px;">➡️</div>
+with col1:
+    st.markdown("""
+    <div class="arch-box">
+    STA Report Input
+    </div>
+    """, unsafe_allow_html=True)
 
-<div style="
-background:#161B22;
-padding:20px;
-border-radius:15px;
-border:1px solid #30363D;
-width:180px;
-text-align:center;
-animation: fadeInAnimation 1.3s ease-in;
-">
-<h3> Analysis Engine</h3>
-<p>Path Correlation & Metrics</p>
-</div>
+with col2:
+    st.markdown("""
+    <div class="arch-box">
+    Correlation Engine
+    </div>
+    """, unsafe_allow_html=True)
 
-<div style="font-size:40px;">➡️</div>
+with col3:
+    st.markdown("""
+    <div class="arch-box">
+    Corner Reduction
+    </div>
+    """, unsafe_allow_html=True)
 
-<div style="
-background:#161B22;
-padding:20px;
-border-radius:15px;
-border:1px solid #30363D;
-width:180px;
-text-align:center;
-animation: fadeInAnimation 1.6s ease-in;
-">
-<h3> ML Prediction</h3>
-<p>Corner Importance Estimation</p>
-</div>
+with col4:
+    st.markdown("""
+    <div class="arch-box">
+    ML Prediction
+    </div>
+    """, unsafe_allow_html=True)
 
-<div style="font-size:40px;">➡️</div>
-
-<div style="
-background:#161B22;
-padding:20px;
-border-radius:15px;
-border:1px solid #30363D;
-width:180px;
-text-align:center;
-animation: fadeInAnimation 1.9s ease-in;
-">
-<h3> Visualization</h3>
-<p>Interactive Analytics Dashboard</p>
-</div>
-
-</div>
-"""
-
-st.markdown(
-    architecture_html,
-    unsafe_allow_html=True
-)
+st.markdown("<div class='arrow'>↓</div>", unsafe_allow_html=True)
 
 
 # =====================================================
 # FILE UPLOAD
 # =====================================================
+
 uploaded_files = st.file_uploader(
-    " Upload STA Timing Reports",
-    accept_multiple_files=True,
-    type=["txt", "rpt"]
+    "Upload STA Reports",
+    accept_multiple_files=True
 )
 
 
 # =====================================================
-# MAIN ANALYSIS
+# MAIN EXECUTION
 # =====================================================
-if uploaded_files:
+
+if uploaded_files or demo_mode:
 
     temp_paths = []
     file_name_map = {}
 
-    # -------------------------------------------------
-    # SAVE FILES
-    # -------------------------------------------------
-    for file in uploaded_files:
+    # =====================================================
+    # DEMO MODE FILES
+    # =====================================================
 
-        temp_file = tempfile.NamedTemporaryFile(
-            delete=False,
-            suffix=".txt"
-        )
+    if demo_mode:
 
-        temp_file.write(file.getvalue())
-        temp_file.close()
+        demo_files = [
+            "temp_reports/ssg_wc.txt",
+            "temp_reports/tt_nominal.txt",
+            "temp_reports/ff_fast.txt",
+            "temp_reports/low_voltage.txt"
+        ]
 
-        temp_paths.append(temp_file.name)
+        for path in demo_files:
 
-        clean_name = (
-            os.path.basename(file.name)
-            .replace(".txt", "")
-            .replace(".rpt", "")
-        )
+            temp_paths.append(path)
 
-        temp_key = os.path.basename(temp_file.name).split(".")[0]
+            clean_name = (
+                os.path.basename(path)
+                .replace(".txt", "")
+            )
 
-        file_name_map[temp_key] = clean_name
+            temp_key = (
+                os.path.basename(path)
+                .split(".")[0]
+            )
 
-    # -------------------------------------------------
+            file_name_map[temp_key] = clean_name
+
+    # =====================================================
+    # USER UPLOAD FILES
+    # =====================================================
+
+    if uploaded_files:
+
+        for file in uploaded_files:
+
+            temp_file = tempfile.NamedTemporaryFile(
+                delete=False,
+                suffix=".txt"
+            )
+
+            temp_file.write(file.getvalue())
+            temp_file.close()
+
+            temp_paths.append(temp_file.name)
+
+            clean_name = (
+                file.name
+                .replace(".txt", "")
+                .replace(".rpt", "")
+            )
+
+            temp_key = (
+                os.path.basename(temp_file.name)
+                .split(".")[0]
+            )
+
+            file_name_map[temp_key] = clean_name
+
+    # =====================================================
     # RUN PIPELINE
-    # -------------------------------------------------
+    # =====================================================
+
     results, selected = main_pipeline(temp_paths)
 
-    # -------------------------------------------------
-    # FIX CORNER NAMES
-    # -------------------------------------------------
+    # =====================================================
+    # FIX FILE NAMES
+    # =====================================================
+
     renamed_results = {}
 
     for key, data in results.items():
 
-        clean_key = os.path.basename(key).split(".")[0]
+        clean_key = (
+            os.path.basename(key)
+            .split(".")[0]
+        )
 
         original_name = file_name_map.get(
             clean_key,
@@ -302,40 +297,48 @@ if uploaded_files:
     results = renamed_results
 
     selected = [
-        file_name_map.get(s, os.path.basename(s))
+        file_name_map.get(
+            os.path.basename(s).split(".")[0],
+            os.path.basename(s).split(".")[0]
+        )
         for s in selected
     ]
 
-    # =================================================
+    # =====================================================
     # SUMMARY
-    # =================================================
+    # =====================================================
+
     st.markdown("---")
 
     col1, col2 = st.columns(2)
 
-    col1.metric(
-        "Total Corners",
-        len(results)
-    )
+    with col1:
+        st.metric(
+            "Total Corners",
+            len(results)
+        )
 
-    col2.metric(
-        "Selected Corners",
-        len(selected)
-    )
+    with col2:
+        st.metric(
+            "Selected Corners",
+            len(selected)
+        )
 
-    # =================================================
+    # =====================================================
     # SELECTED CORNERS
-    # =================================================
-    st.markdown("##  Selected Optimal Corners")
+    # =====================================================
 
-    cols = st.columns(max(len(selected), 1))
+    st.markdown("## Selected Optimal Corners")
+
+    cols = st.columns(len(selected))
 
     for i, corner in enumerate(selected):
         cols[i].success(corner)
 
-    # =================================================
+    # =====================================================
     # METRICS
-    # =================================================
+    # =====================================================
+
     corners = list(results.keys())
 
     wns = [
@@ -348,52 +351,33 @@ if uploaded_files:
         for c in corners
     ]
 
-    # =================================================
-    # DATAFRAME
-    # =================================================
-    st.markdown("##  Corner Metrics")
-
-    metrics_data = {
-        "Corner": corners,
-        "WNS": wns,
-        "TNS": tns
-    }
-
-    st.dataframe(
-        metrics_data,
-        use_container_width=True
-    )
-
-    # =================================================
+    # =====================================================
     # BAR CHART
-    # =================================================
-    st.markdown("##  WNS vs TNS Analysis")
+    # =====================================================
+
+    st.markdown("## WNS vs TNS")
 
     fig_bar = go.Figure()
 
-    fig_bar.add_trace(
-        go.Bar(
-            x=corners,
-            y=wns,
-            name="WNS"
-        )
-    )
+    fig_bar.add_trace(go.Bar(
+        x=corners,
+        y=wns,
+        name="WNS"
+    ))
 
-    fig_bar.add_trace(
-        go.Bar(
-            x=corners,
-            y=tns,
-            name="TNS"
-        )
-    )
+    fig_bar.add_trace(go.Bar(
+        x=corners,
+        y=tns,
+        name="TNS"
+    ))
 
     fig_bar.update_layout(
+        barmode="group",
         title="Corner Timing Metrics",
         xaxis_title="Corners",
         yaxis_title="Slack Values",
-        barmode="group",
-        height=500,
-        template="plotly_dark"
+        template="plotly_dark",
+        height=500
     )
 
     st.plotly_chart(
@@ -401,10 +385,11 @@ if uploaded_files:
         use_container_width=True
     )
 
-    # =================================================
-    # HEATMAP
-    # =================================================
-    st.markdown("##  Correlation Heatmap")
+    # =====================================================
+    # CORRELATION HEATMAP
+    # =====================================================
+
+    st.markdown("## Correlation Heatmap")
 
     aligned_vectors = align_paths(results)
 
@@ -425,8 +410,8 @@ if uploaded_files:
     )
 
     fig_heatmap.update_layout(
-        height=600,
-        template="plotly_dark"
+        template="plotly_dark",
+        height=600
     )
 
     st.plotly_chart(
@@ -434,32 +419,32 @@ if uploaded_files:
         use_container_width=True
     )
 
-    # =================================================
+    # =====================================================
     # DETAILED DATA
-    # =================================================
-    st.markdown("##  Detailed Corner Data")
+    # =====================================================
+
+    st.markdown("## Detailed Corner Data")
 
     for corner, data in results.items():
 
-        with st.expander(f" {corner}"):
+        with st.expander(corner):
 
             st.write(
-                "### Metrics"
+                "Metrics:",
+                data["metrics"]
             )
-
-            st.json(data["metrics"])
 
             st.write(
-                "### Paths"
+                "Paths:",
+                data["paths"]
             )
 
-            st.json(data["paths"])
+    # =====================================================
+    # ML PREDICTION
+    # =====================================================
 
-    # =================================================
-    # ML PREDICTIONS
-    # =================================================
     st.markdown(
-        "##  ML-Based Corner Importance Prediction"
+        "## ML-Based Corner Importance Prediction"
     )
 
     model, _ = train_model(
@@ -477,23 +462,27 @@ if uploaded_files:
         decision = pred["decision"]
         confidence = pred["confidence"]
 
-        message = (
-            f"{corner} → "
-            f"{decision} "
-            f"(Confidence: {confidence})"
-        )
-
         if decision == "KEEP":
-            st.success(message)
-        else:
-            st.warning(message)
 
-    # =================================================
+            st.success(
+                f"{corner} → {decision} "
+                f"(Confidence: {confidence})"
+            )
+
+        else:
+
+            st.warning(
+                f"{corner} → {decision} "
+                f"(Confidence: {confidence})"
+            )
+
+    # =====================================================
     # FOOTER
-    # =================================================
+    # =====================================================
+
     st.markdown("---")
 
     st.caption(
-        "Built with Python + Streamlit | "
-        "Adaptive STA PVT Corner Reduction Framework"
+        "Built using Python, Streamlit, Plotly "
+        "and ML-assisted STA analytics"
     )

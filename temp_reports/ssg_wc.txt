@@ -1,0 +1,6 @@
+Startpoint: CPU_CORE
+Endpoint: SRAM_BLOCK
+Slack: -0.42
+Delay: 5.12
+WNS: -0.42
+TNS: -12.4
